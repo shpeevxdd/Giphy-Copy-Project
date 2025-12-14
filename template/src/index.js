@@ -1,3 +1,14 @@
-// main js file + api key for giphy
+import { HOME } from './common/constants.js';
+import { loadPage } from './events/navigation-events.js';
+import { q } from './events/helpers.js';
 
-export const key = 'WGZE6THab8arUPRsvqPP6js7Kkcf5w3z';
+document.addEventListener('DOMContentLoaded', () => {
+
+  document.addEventListener('click', e => {
+    if (e.target.classList.contains('nav-link')) {
+      loadPage(e.target.getAttribute('data-page'));
+    }
+  });
+
+  loadPage(HOME);
+});

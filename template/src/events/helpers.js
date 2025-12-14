@@ -17,10 +17,10 @@ export const setActiveNav = (page) => {
       );
 };
 
-export const renderFavoriteStatus = (movieId) => {
+export const renderFavoriteStatus = (gifId) => {
   const favorites = getFavorites();
 
-  return favorites.includes(movieId)
-    ? `<span class="favorite active" data-movie-id="${movieId}">${FULL_HEART}</span>`
-    : `<span class="favorite" data-movie-id="${movieId}">${EMPTY_HEART}</span>`;
+  return favorites.includes(gifId)
+    ? `<span class="favorite active" data-gif-id="${gifId}">${FULL_HEART}</span>`
+    : `<span class="favorite" data-gif-id="${gifId}">${EMPTY_HEART}</span>`;
 };
