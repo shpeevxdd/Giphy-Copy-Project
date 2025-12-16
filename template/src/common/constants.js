@@ -1,6 +1,8 @@
 export const HOME = 'home';
 export const TRENDING = 'trending';
 export const ABOUT = 'about';
+export const UPLOAD = 'upload';
+export const UPLOADED = 'uploaded';
 
 export const CONTAINER_SELECTOR = '#container';
 

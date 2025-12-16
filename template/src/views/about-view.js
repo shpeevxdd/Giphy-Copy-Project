@@ -1,3 +1,8 @@
+/**
+ * Generates the HTML markup for the About page.
+ *
+ * @returns {string} HTML string representing the About view.
+ */
 export const toAboutView = () => `
   <div id="about">
     <div class="content">
