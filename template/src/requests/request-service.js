@@ -1,12 +1,12 @@
-import { key } from '../common/constants.js';
+import { key, LIMIT } from '../common/constants.js';
 
 /**
  * Fetches a list of trending GIFs from the Giphy API.
  *
  * @returns {Promise<Object>} A promise resolving to the trending GIFs response object.
  */
-export const loadTrending = () => {
-  return fetch(`https://api.giphy.com/v1/gifs/trending?api_key=${key}&limit=25`)
+export const loadTrending = (offset = 0) => {
+  return fetch(`https://api.giphy.com/v1/gifs/trending?api_key=${key}&limit=${LIMIT}&offset=${offset}`)
     .then(res => res.json());
 };
 
