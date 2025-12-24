@@ -40,7 +40,7 @@ const renderTrendingLayout = () => {
   const container = q(CONTAINER_SELECTOR);
 
   container.innerHTML = `
-    <div class="container-md d-flex justify-content-center flex-wrap gap-3" id="trending">
+    <div class="container-md d-flex justify-content-center flex-wrap gap-2" id="trending">
       <div class="column" style="flex: 0 0 200px;" id="col-1"></div>
       <div class="column" style="flex: 0 0 200px;" id="col-2"></div>
       <div class="column" style="flex: 0 0 200px;" id="col-3"></div>

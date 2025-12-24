@@ -5,22 +5,13 @@ html, body {
 }
 
 body {
-  background: url('../images/dark-linen.jpg') repeat;
-  font-family: 'Roboto', sans-serif;
-}
-
-
-
-header {
-  grid-area: header;
-  height: 200px;
-  background: url('../images/banner-top.jpg');
+  font-family: 'Roboto', sans-serif !important; 
+  background-color: rgb(18, 18, 18) !important;
 }
 
 nav {
   grid-area: menu;
   height: 60px;
-  background: url('../images//banner-bottom.jpg');
   font-size: 1.75em;
   line-height: 60px;
   padding: 20px;
@@ -40,7 +31,6 @@ nav a:hover {
 
 #container {
   grid-area: container;
-  background-color: rgba(0, 0, 0, 0.5);
   padding: 20px;
   color: white;
 }
@@ -110,48 +100,6 @@ span.favorite:hover {
 }
 
 /* End homepage styles */
-
-
-/* Categories styles */
-
-#categories {
-  padding: 50px;
-}
-
-#categories h1 {
-  color: rgb(187, 135, 255);
-}
-
-#categories div.content {
-  font-size: 1.25em;
-}
-
-div.category {
-  display: inline-block;
-  width: 20%;
-  margin: 1%;
-  padding: 1%;
-  border: 1px solid rgb(97, 71, 97);
-  border-radius: 4px;
-  background-color: rgba(0, 0, 0, 0.5);
-  backdrop-filter: blur(2px);
-  text-align: center;
-}
-
-#categories button {
-  font-size: 20px;
-  padding: 5px;
-  color: rgb(187, 135, 255);
-  background-color: rgba(0, 0, 0, 0.5);
-  border: 1px solid black;
-  cursor: pointer;
-}
-
-#categories button:hover {
-  color: white;
-}
-
-/* End categories styles */
 
 
 /* Movies styles */
@@ -271,6 +219,7 @@ div.movie-detailed div.movie-info {
 
 .gif-card {
   width: 251px;
+  padding: 3px 0 3px 0;
 }
 
 .img-fluid {
