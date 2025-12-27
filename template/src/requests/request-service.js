@@ -42,3 +42,25 @@ export const loadGifsByIds = (ids) => {
     `https://api.giphy.com/v1/gifs?api_key=${key}&ids=${ids.join(',')}`
   ).then(res => res.json());
 };
+
+/**
+ * Fetches a single GIF by id from the Giphy API.
+ *
+ * @param {string} gifId - The GIF id.
+ * @returns {Promise<Object>} Giphy API response for the GIF.
+ */
+export const loadGifById = (gifId) => {
+  return fetch(`https://api.giphy.com/v1/gifs/${gifId}?api_key=${key}`)
+    .then(res => res.json());
+};
+
+/**
+ * Fetches a random GIF from the Giphy API.
+ *
+ * @returns {Promise<Object>} Giphy API response for a random GIF.
+ */
+export const loadRandomGif = () => {
+  return fetch(`https://api.giphy.com/v1/gifs/random?api_key=${key}`)
+    .then(res => res.json());
+};
+

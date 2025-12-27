@@ -1,6 +1,3 @@
-import { EMPTY_HEART, FULL_HEART } from '../common/constants.js';
-import { getFavorites } from '../data/favorites.js';
-
 /**
  * Returns the first DOM element that matches the given selector.
  *
@@ -31,18 +28,4 @@ export const setActiveNav = (page) => {
       ? element.classList.add('active')
       : element.classList.remove('active')
   );
-};
-
-/**
- * Renders the favorite icon markup based on the GIF's favorite status.
- *
- * @param {string} gifId - The unique identifier of the GIF.
- * @returns {string} HTML string representing the favorite icon.
- */
-export const renderFavoriteStatus = (gifId) => {
-  const favorites = getFavorites();
-
-  return favorites.includes(gifId)
-    ? `<span class="favorite active" data-gif-id="${gifId}">${FULL_HEART}</span>`
-    : `<span class="favorite" data-gif-id="${gifId}">${EMPTY_HEART}</span>`;
 };

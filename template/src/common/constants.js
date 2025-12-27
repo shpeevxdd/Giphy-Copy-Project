@@ -5,6 +5,7 @@ export const UPLOAD = 'upload';
 export const UPLOADED = 'uploaded';
 
 export const CONTAINER_SELECTOR = '#container';
+export const FAVORITEGIF = 'favoriteGif';
 
 export const FULL_HEART = '❤';
 

@@ -1,5 +1,6 @@
 import { HOME } from './common/constants.js';
 import { loadPage } from './events/navigation-events.js';
+import { attachFavoriteGifEvents } from './events/favorite-gif-events.js';
 
 /**
  * Initializes the application after the DOM content is fully loaded.
@@ -9,11 +10,12 @@ import { loadPage } from './events/navigation-events.js';
  */
 document.addEventListener('DOMContentLoaded', () => {
 
-  document.addEventListener('click', (e) => {
+  document.addEventListener('click', e => {
     if (e.target.classList.contains('nav-link')) {
       loadPage(e.target.getAttribute('data-page'));
     }
   });
 
+  attachFavoriteGifEvents();
   loadPage(HOME);
 });

@@ -1,5 +1,18 @@
-import { HOME, TRENDING, ABOUT, UPLOAD, UPLOADED } from '../common/constants.js';
-import { renderTrending, renderAbout, renderUpload, renderUploaded } from './render-events.js';
+import {
+  HOME,
+  TRENDING,
+  ABOUT,
+  UPLOAD,
+  UPLOADED,
+  FAVORITEGIF,
+} from "../common/constants.js";
+import {
+  renderTrending,
+  renderAbout,
+  renderUpload,
+  renderUploaded,
+  renderFavoriteGif,
+} from "./render-events.js";
 
 /**
  * Loads and renders a page based on the given page identifier.
@@ -10,7 +23,7 @@ import { renderTrending, renderAbout, renderUpload, renderUploaded } from './ren
 export const loadPage = (page) => {
   switch (page) {
     case HOME:
-      
+
     case TRENDING:
       return renderTrending();
 
@@ -19,10 +32,12 @@ export const loadPage = (page) => {
 
     case UPLOAD:
       return renderUpload();
-      
+
     case UPLOADED:
       return renderUploaded();
 
+    case FAVORITEGIF:
+      return renderFavoriteGif();
 
     default:
       return null;

@@ -1,14 +1,19 @@
-import { loadTrending } from '../requests/request-service.js';
-import { toTrendingView } from '../views/trending-view.js';
-import { toAboutView } from '../views/about-view.js';
-import { uploadView } from '../views/upload-view.js';
-import { attachUploadEvents } from './upload-events.js';
-import { q } from './helpers.js';
-import { CONTAINER_SELECTOR } from '../common/constants.js';
-import { loadGifsByIds } from '../requests/request-service.js';
-import { getUploadedGifs } from '../data/uploaded-gifs.js';
-import { toUploadedView } from '../views/uploaded-view.js';
-
+import {
+  loadGifById,
+  loadRandomGif,
+  loadTrending,
+} from "../requests/request-service.js";
+import { toTrendingView } from "../views/trending-view.js";
+import { toAboutView } from "../views/about-view.js";
+import { uploadView } from "../views/upload-view.js";
+import { attachUploadEvents } from "./upload-events.js";
+import { q } from "./helpers.js";
+import { CONTAINER_SELECTOR } from "../common/constants.js";
+import { loadGifsByIds } from "../requests/request-service.js";
+import { getUploadedGifs } from "../data/uploaded-gifs.js";
+import { toUploadedView } from "../views/uploaded-view.js";
+import { getFavoriteGifId } from "../data/favorite-gif.js";
+import { toFavoriteGifView } from "../views/favorite-gif-view.js";
 
 /**
  * Tracks the total number of GIFs rendered in the Trending page so far.
@@ -67,7 +72,7 @@ const appendGifsToColumns = (gifs) => {
 
   columns.forEach((colGifs, index) => {
     const col = q(`#col-${index + 1}`);
-    col.insertAdjacentHTML('beforeend', colGifs.join(''));
+    col.insertAdjacentHTML("beforeend", colGifs.join(""));
   });
 
   renderedCount += gifs.length;
@@ -85,7 +90,7 @@ const loadMoreTrending = () => {
 
   isLoading = true;
 
-  loadTrending(renderedCount).then(res => {
+  loadTrending(renderedCount).then((res) => {
     if (!isTrendingActive) return;
 
     appendGifsToColumns(res.data);
@@ -100,10 +105,7 @@ const loadMoreTrending = () => {
  * @returns {void}
  */
 const onTrendingScroll = () => {
-  if (
-    window.innerHeight + window.scrollY >=
-    document.body.offsetHeight - 500
-  ) {
+  if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 500) {
     loadMoreTrending();
   }
 };
@@ -120,7 +122,7 @@ export const renderTrending = () => {
   renderTrendingLayout();
   loadMoreTrending();
 
-  window.addEventListener('scroll', onTrendingScroll);
+  window.addEventListener("scroll", onTrendingScroll);
 };
 
 /**
@@ -133,7 +135,7 @@ export const leaveTrending = () => {
   isTrendingActive = false;
   isLoading = false;
 
-  window.removeEventListener('scroll', onTrendingScroll);
+  window.removeEventListener("scroll", onTrendingScroll);
 };
 
 /**
@@ -163,11 +165,63 @@ export const renderUpload = () => {
 export const renderUploaded = () => {
   const ids = getUploadedGifs();
 
-  loadGifsByIds(ids).then(res => {
-    const gifsHtml = res.data
-      .map(gif => toTrendingView(gif))
-      .join('');
+  loadGifsByIds(ids).then((res) => {
+    const gifsHtml = res.data.map((gif) => toTrendingView(gif)).join("");
 
     q(CONTAINER_SELECTOR).innerHTML = toUploadedView(gifsHtml);
   });
 };
+
+/**
+ * Gets a usable GIF URL from a Random endpoint GIF object.
+ *
+ * @param {Object} gif - Random endpoint GIF object.
+ * @returns {string} A GIF URL.
+ */
+const getRandomGifUrl = (gif) => {
+  return gif?.images?.fixed_height?.url
+    || gif?.images?.original?.url
+    || gif?.image_url
+    || gif?.image_original_url
+    || gif?.image_fixed_height_url
+    || '';
+};
+
+/**
+ * Renders the Favorite GIF page.
+ * If the user has no chosen favorite yet, shows a notification and a random GIF.
+ *
+ * @returns {void}
+ */
+export const renderFavoriteGif = () => {
+  const favoriteId = getFavoriteGifId();
+
+  if (!favoriteId) {
+    loadRandomGif().then(res => {
+      const randomGif = res.data;
+
+      const gifUrl = getRandomGifUrl(randomGif);
+
+      const gifHtml = gifUrl
+        ? `<img src="${gifUrl}" alt="Random GIF" class="img-fluid" />`
+        : `<p>Could not load a random GIF.</p>`;
+
+      q(CONTAINER_SELECTOR).innerHTML = toFavoriteGifView(
+        'You have not chosen a favorite GIF yet. Here is a random one:',
+        gifHtml
+      );
+    });
+
+    return;
+  }
+
+  loadGifById(favoriteId).then(res => {
+    const gif = res.data;
+    const gifHtml = `
+      <img src="${gif.images.fixed_height.url}" alt="${gif.title}" class="img-fluid" />
+    `;
+
+    q(CONTAINER_SELECTOR).innerHTML = toFavoriteGifView('', gifHtml);
+  });
+};
+
