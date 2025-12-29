@@ -12,8 +12,8 @@ import { CONTAINER_SELECTOR } from "../common/constants.js";
 import { loadGifsByIds } from "../requests/request-service.js";
 import { getUploadedGifs } from "../data/uploaded-gifs.js";
 import { toUploadedView } from "../views/uploaded-view.js";
-import { getFavoriteGifId } from "../data/favorite-gif.js";
-import { toFavoriteGifView } from "../views/favorite-gif-view.js";
+import { getFavoriteGifIds } from "../data/favorites.js";
+import { toFavoritesView } from "../views/favorites-view.js";
 
 /**
  * Tracks the total number of GIFs rendered in the Trending page so far.
@@ -35,7 +35,7 @@ let isLoading = false;
 let isTrendingActive = false;
 
 /**
- * Renders the Trending page layout inside the shared container.
+ * Renders the Trending layout inside the shared container.
  * Creates four columns for GIFs.
  * Resets renderedCount to zero.
  *
@@ -65,9 +65,11 @@ const renderTrendingLayout = () => {
 const appendGifsToColumns = (gifs) => {
   const columns = [[], [], [], []];
 
+  const favoriteIds = new Set(getFavoriteGifIds());
+
   gifs.forEach((gif, i) => {
     const columnIndex = (renderedCount + i) % 4;
-    columns[columnIndex].push(toTrendingView(gif));
+    columns[columnIndex].push(toTrendingView(gif, favoriteIds.has(gif.id)));
   });
 
   columns.forEach((colGifs, index) => {
@@ -90,17 +92,18 @@ const loadMoreTrending = () => {
 
   isLoading = true;
 
-  loadTrending(renderedCount).then((res) => {
-    if (!isTrendingActive) return;
-
-    appendGifsToColumns(res.data);
-    isLoading = false;
-  });
+  loadTrending(renderedCount)
+    .then((res) => {
+      appendGifsToColumns(res.data);
+    })
+    .finally(() => {
+      isLoading = false;
+    });
 };
 
 /**
- * Scroll event handler for infinite scrolling on the Trending page.
- * Loads more GIFs when the user scrolls near the bottom.
+ * Handles scrolling on the Trending page.
+ * When user reaches near the bottom, loads more GIFs.
  *
  * @returns {void}
  */
@@ -131,7 +134,7 @@ export const renderTrending = () => {
  *
  * @returns {void}
  */
-export const leaveTrending = () => {
+export const exitTrending = () => {
   isTrendingActive = false;
   isLoading = false;
 
@@ -166,7 +169,10 @@ export const renderUploaded = () => {
   const ids = getUploadedGifs();
 
   loadGifsByIds(ids).then((res) => {
-    const gifsHtml = res.data.map((gif) => toTrendingView(gif)).join("");
+    const favoriteIds = new Set(getFavoriteGifIds());
+    const gifsHtml = res.data
+      .map((gif) => toTrendingView(gif, favoriteIds.has(gif.id)))
+      .join("");
 
     q(CONTAINER_SELECTOR).innerHTML = toUploadedView(gifsHtml);
   });
@@ -188,40 +194,61 @@ const getRandomGifUrl = (gif) => {
 };
 
 /**
- * Renders the Favorite GIF page.
- * If the user has no chosen favorite yet, shows a notification and a random GIF.
+ * Renders the Favorites page.
+ * If the user has no favorites yet, shows a notification and a random GIF.
  *
  * @returns {void}
  */
-export const renderFavoriteGif = () => {
-  const favoriteId = getFavoriteGifId();
+export const renderFavorites = () => {
+  const favoriteIdsArr = getFavoriteGifIds();
 
-  if (!favoriteId) {
-    loadRandomGif().then(res => {
+  q(CONTAINER_SELECTOR).innerHTML = toFavoritesView(
+    favoriteIdsArr.length ? '' : 'You have no favorites yet.'
+  );
+
+  if (!favoriteIdsArr.length) {
+    // Keep the previous behavior: show a random GIF when there are no favorites yet.
+    loadRandomGif().then((res) => {
       const randomGif = res.data;
 
-      const gifUrl = getRandomGifUrl(randomGif);
+      if (!randomGif?.id) {
+        return;
+      }
 
-      const gifHtml = gifUrl
-        ? `<img src="${gifUrl}" alt="Random GIF" class="img-fluid" />`
-        : `<p>Could not load a random GIF.</p>`;
-
-      q(CONTAINER_SELECTOR).innerHTML = toFavoriteGifView(
-        'You have not chosen a favorite GIF yet. Here is a random one:',
-        gifHtml
+      // Re-render so the random GIF shows under the message.
+      q(CONTAINER_SELECTOR).innerHTML = toFavoritesView(
+        'You have no favorites yet. Here is a random one:'
       );
+
+      const favoriteIds = new Set(getFavoriteGifIds());
+      const gifHtml = toTrendingView(randomGif, favoriteIds.has(randomGif.id));
+
+      const columns = [[], [], [], []];
+      columns[0].push(gifHtml);
+
+      columns.forEach((colGifs, index) => {
+        const col = q(`#favorites-col-${index + 1}`);
+        col.insertAdjacentHTML("beforeend", colGifs.join(""));
+      });
     });
 
     return;
   }
 
-  loadGifById(favoriteId).then(res => {
-    const gif = res.data;
-    const gifHtml = `
-      <img src="${gif.images.fixed_height.url}" alt="${gif.title}" class="img-fluid" />
-    `;
+  loadGifsByIds(favoriteIdsArr).then((res) => {
+    const favoriteIds = new Set(getFavoriteGifIds());
+    const gifs = res.data;
 
-    q(CONTAINER_SELECTOR).innerHTML = toFavoriteGifView('', gifHtml);
+    const columns = [[], [], [], []];
+
+    gifs.forEach((gif, i) => {
+      const columnIndex = i % 4;
+      columns[columnIndex].push(toTrendingView(gif, favoriteIds.has(gif.id)));
+    });
+
+    columns.forEach((colGifs, index) => {
+      const col = q(`#favorites-col-${index + 1}`);
+      col.insertAdjacentHTML("beforeend", colGifs.join(""));
+    });
   });
 };
-

@@ -4,14 +4,14 @@ import {
   ABOUT,
   UPLOAD,
   UPLOADED,
-  FAVORITEGIF,
+  FAVORITES,
 } from "../common/constants.js";
 import {
   renderTrending,
   renderAbout,
   renderUpload,
   renderUploaded,
-  renderFavoriteGif,
+  renderFavorites,
 } from "./render-events.js";
 
 /**
@@ -36,8 +36,8 @@ export const loadPage = (page) => {
     case UPLOADED:
       return renderUploaded();
 
-    case FAVORITEGIF:
-      return renderFavoriteGif();
+    case FAVORITES:
+      return renderFavorites();
 
     default:
       return null;
