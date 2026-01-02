@@ -8,7 +8,7 @@ import { EMPTY_HEART, FULL_HEART } from '../common/constants.js';
  * @returns {string} HTML string representing a GIF card.
  */
 export const toTrendingView = (gif, isFavorite = false) => `
-  <div class="gif-card" data-gif-id="${gif.id}">
+  <div class="gif-card" data-gif-id="${gif.id}" data-action="open-details">
     <img
       src="${gif.images.fixed_height.url}"
       alt="${gif.title}"
@@ -17,6 +17,7 @@ export const toTrendingView = (gif, isFavorite = false) => `
     <button
       class="btn btn-sm btn-outline-warning mt-1 toggle-favorite-btn position"
       data-gif-id="${gif.id}"
+      data-action="toggle-favorite"
       aria-label="${isFavorite ? 'Remove from favorites' : 'Add to favorites'}"
     >
       ${isFavorite ? FULL_HEART : EMPTY_HEART}

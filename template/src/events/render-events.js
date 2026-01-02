@@ -14,6 +14,7 @@ import { getUploadedGifs } from "../data/uploaded-gifs.js";
 import { toUploadedView } from "../views/uploaded-view.js";
 import { getFavoriteGifIds } from "../data/favorites.js";
 import { toFavoritesView } from "../views/favorites-view.js";
+import { gifDetailsView } from "../views/gif-detail-view.js";
 
 /**
  * Tracks the total number of GIFs rendered in the Trending page so far.
@@ -177,6 +178,58 @@ export const renderUploaded = () => {
     q(CONTAINER_SELECTOR).innerHTML = toUploadedView(gifsHtml);
   });
 };
+
+/**
+ * Fetches a GIF by its ID and renders its details inside a container.
+ *
+ * @param {string} gifId - The unique identifier of the GIF to fetch and display.
+ * @returns {void} This function does not return anything. It updates the DOM asynchronously.
+ */
+export const renderGifDetails = (gifId) => {
+  loadGifById(gifId).then((res) => {
+    const gif = res.data;
+
+    if (!gif) {
+      q(CONTAINER_SELECTOR).innerHTML = "<p>GIF not found.</p>";
+      return;
+    }
+
+    q(CONTAINER_SELECTOR).innerHTML = gifDetailsView(gif);
+  });
+}
+
+/**
+ * Handles click events on the document to provide GIF-related interactions.
+ *
+ * - If the clicked element has an id of "back-btn", it renders trending GIFs.
+ * - If the clicked element or its parent has a `data-action` attribute:
+ *   - `"toggle-favorite"` toggles the GIF as favorite.
+ *   - `"open-details"` opens the GIF details by calling `renderGifDetails`.
+ *
+ * @param {MouseEvent} e - The click event object.
+ */
+document.addEventListener("click", (e) => {
+
+  if (e.target.id === "back-btn") {
+    renderTrending();
+    return;
+  }
+
+  const actionEl = e.target.closest("[data-action]");
+  if (!actionEl) return;
+
+  const gifId = actionEl.dataset.gifId;
+
+  if (actionEl.dataset.action === "toggle-favorite") {
+    e.stopPropagation();
+    toggleFavorite(gifId);
+    return;
+  }
+
+  if (actionEl.dataset.action === "open-details") {
+    renderGifDetails(gifId);
+  }
+});
 
 /**
  * Gets a usable GIF URL from a Random endpoint GIF object.

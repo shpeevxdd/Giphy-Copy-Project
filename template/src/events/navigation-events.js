@@ -38,7 +38,9 @@ export const loadPage = (page) => {
 
     case FAVORITES:
       return renderFavorites();
-
+    
+    case GIF_DETAILS:
+      return renderGifDetails(payload);
     default:
       return null;
   }
