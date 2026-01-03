@@ -12,7 +12,10 @@ import {
   renderUpload,
   renderUploaded,
   renderFavorites,
+  exitTrending,
+  exitSearch,
 } from "./render-events.js";
+import { setActiveNav } from "./helpers.js";
 
 /**
  * Loads and renders a page based on the given page identifier.
@@ -21,26 +24,32 @@ import {
  * @returns {void|null} Renders the corresponding page or returns null if page is invalid.
  */
 export const loadPage = (page) => {
+  // Stop any grid infinite-scroll modes before switching pages.
+  exitTrending();
+  exitSearch();
+
   switch (page) {
     case HOME:
-
     case TRENDING:
+      setActiveNav(TRENDING);
       return renderTrending();
 
     case ABOUT:
+      setActiveNav(ABOUT);
       return renderAbout();
 
     case UPLOAD:
+      setActiveNav(UPLOAD);
       return renderUpload();
 
     case UPLOADED:
+      setActiveNav(UPLOADED);
       return renderUploaded();
 
     case FAVORITES:
+      setActiveNav(FAVORITES);
       return renderFavorites();
-    
-    case GIF_DETAILS:
-      return renderGifDetails(payload);
+
     default:
       return null;
   }

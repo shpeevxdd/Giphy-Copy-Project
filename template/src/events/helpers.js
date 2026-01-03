@@ -21,11 +21,11 @@ export const qs = (selector) => document.querySelectorAll(selector);
  * @returns {void}
  */
 export const setActiveNav = (page) => {
-  const navs = qs('a.nav-link');
+  const navs = qs("a.nav-link");
 
-  Array.from(navs).forEach(element =>
-    element.getAttribute('data-page') === page
-      ? element.classList.add('active')
-      : element.classList.remove('active')
+  Array.from(navs).forEach((element) =>
+    element.getAttribute("data-page") === page
+      ? element.classList.add("active")
+      : element.classList.remove("active")
   );
 };

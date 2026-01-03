@@ -1,0 +1,30 @@
+{
+  "env": {
+    "browser": true,
+    "es6": true
+  },
+  "parserOptions": {
+    "ecmaVersion": 2022,
+    "sourceType": "module"
+  },
+  "extends": ["google"],
+  "rules": {
+    "require-jsdoc": "off",
+    "valid-jsdoc": "off",
+
+    "quotes": "off",
+    "linebreak-style": "off",
+    "comma-dangle": "off",
+    "operator-linebreak": "off",
+    "max-len": "off",
+    "object-curly-spacing": "off",
+    "indent": "off",
+    "space-in-parens": ["error", "never"],
+
+    "semi": ["error", "always"],
+    "eqeqeq": ["error", "always"],
+    "no-undef": "error",
+    "no-unused-vars": ["error", { "varsIgnorePattern": "_" }],
+    "no-use-before-define": "off"
+  }
+}

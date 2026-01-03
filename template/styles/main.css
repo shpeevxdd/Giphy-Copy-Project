@@ -233,3 +233,36 @@ div.movie-detailed div.movie-info {
   left: 5px;
   z-index: 1;
 }
+
+.search-wrapper {
+  position: relative;
+}
+
+.search-wrapper input {
+  width: 100%;
+  padding: 8px 38px 8px 10px;
+  border-radius: 20px;
+  border: 1px solid #ccc;
+  outline: none;
+  font-size: 14px;
+}
+
+.search-wrapper input:focus {
+  border-color: #6c5ce7;
+}
+
+#search-btn {
+  position: absolute;
+  right: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: 16px;
+  opacity: 0.7;
+}
+
+#search-btn:hover {
+  opacity: 1;
+}

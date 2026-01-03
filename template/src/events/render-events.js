@@ -2,6 +2,8 @@ import {
   loadGifById,
   loadRandomGif,
   loadTrending,
+  searchGifs,
+  loadGifsByIds,
 } from "../requests/request-service.js";
 import { toTrendingView } from "../views/trending-view.js";
 import { toAboutView } from "../views/about-view.js";
@@ -9,7 +11,6 @@ import { uploadView } from "../views/upload-view.js";
 import { attachUploadEvents } from "./upload-events.js";
 import { q } from "./helpers.js";
 import { CONTAINER_SELECTOR } from "../common/constants.js";
-import { loadGifsByIds } from "../requests/request-service.js";
 import { getUploadedGifs } from "../data/uploaded-gifs.js";
 import { toUploadedView } from "../views/uploaded-view.js";
 import { getFavoriteGifIds } from "../data/favorites.js";
@@ -17,36 +18,58 @@ import { toFavoritesView } from "../views/favorites-view.js";
 import { gifDetailsView } from "../views/gif-detail-view.js";
 
 /**
- * Tracks the total number of GIFs rendered in the Trending page so far.
+ * Current "grid" mode.
+ * - 'trending': trending endpoint with infinite scroll
+ * - 'search': search endpoint with infinite scroll
+ *
+ * @type {'trending' | 'search' | 'none'}
+ */
+let activeGridMode = "none";
+
+/**
+ * Current search query (only used when activeGridMode === 'search').
+ * @type {string}
+ */
+let activeSearchQuery = "";
+
+/**
+ * Tracks how many GIFs have been rendered in the active grid.
+ * Used as offset for the next request.
  * @type {number}
  */
 let renderedCount = 0;
 
 /**
- * Indicates whether an API request is currently in progress to prevent duplicate requests.
+ * Prevents overlapping requests when scrolling.
  * @type {boolean}
  */
 let isLoading = false;
 
 /**
- * Flags whether the Trending page is currently active.
- * This is used to prevent GIF loading on other pages.
- * @type {boolean}
- */
-let isTrendingActive = false;
-
-/**
- * Renders the Trending layout inside the shared container.
- * Creates four columns for GIFs.
- * Resets renderedCount to zero.
+ * Renders a reusable 4-column GIF grid layout into the shared container.
  *
+ * @param {Object} opts
+ * @param {('trending'|'search')} opts.mode
+ * @param {string} [opts.query]
  * @returns {void}
  */
-const renderTrendingLayout = () => {
+const renderGridLayout = ({ mode, query = "" }) => {
   const container = q(CONTAINER_SELECTOR);
 
+  const headerHtml =
+    mode === "search"
+      ? `
+      <div class="container-md">
+        <div class="py-2 text-center">
+          <h5 class="m-0">Search results for: <span class="text-muted">"${query}"</span></h5>
+        </div>
+      </div>
+    `
+      : "";
+
   container.innerHTML = `
-    <div class="container-md d-flex justify-content-center flex-wrap gap-2" id="trending">
+    ${headerHtml}
+    <div class="container-md d-flex justify-content-center flex-wrap gap-2" id="gif-grid">
       <div class="column" style="flex: 0 0 200px;" id="col-1"></div>
       <div class="column" style="flex: 0 0 200px;" id="col-2"></div>
       <div class="column" style="flex: 0 0 200px;" id="col-3"></div>
@@ -58,14 +81,13 @@ const renderTrendingLayout = () => {
 };
 
 /**
- * Converts an array of GIF objects into HTML and appends them evenly to the four columns.
+ * Appends an array of GIF objects into the 4 columns, distributing evenly.
  *
- * @param {Array<Object>} gifs - Array of GIF objects from the API.
+ * @param {Array<Object>} gifs
  * @returns {void}
  */
 const appendGifsToColumns = (gifs) => {
   const columns = [[], [], [], []];
-
   const favoriteIds = new Set(getFavoriteGifIds());
 
   gifs.forEach((gif, i) => {
@@ -75,6 +97,9 @@ const appendGifsToColumns = (gifs) => {
 
   columns.forEach((colGifs, index) => {
     const col = q(`#col-${index + 1}`);
+    if (!col) {
+      return;
+    }
     col.insertAdjacentHTML("beforeend", colGifs.join(""));
   });
 
@@ -82,20 +107,39 @@ const appendGifsToColumns = (gifs) => {
 };
 
 /**
- * Fetches more Trending GIFs from the API and appends them to the page.
- * Prevents multiple concurrent requests and ensures GIFs are only loaded on the active page.
+ * Loads the next page of GIFs based on the active grid mode.
  *
  * @returns {void}
  */
-const loadMoreTrending = () => {
-  if (!isTrendingActive) return;
-  if (isLoading) return;
+const loadMoreGridGifs = () => {
+  if (activeGridMode === "none") {
+    return;
+  }
+  if (isLoading) {
+    return;
+  }
 
   isLoading = true;
 
-  loadTrending(renderedCount)
+  const request =
+    activeGridMode === "trending"
+      ? loadTrending(renderedCount)
+      : searchGifs(activeSearchQuery, renderedCount);
+
+  request
     .then((res) => {
-      appendGifsToColumns(res.data);
+      const gifs = res?.data || [];
+
+      if (!gifs.length && renderedCount === 0) {
+        // Empty state for the first page only
+        q(CONTAINER_SELECTOR).insertAdjacentHTML(
+          "beforeend",
+          '<p class="text-center text-muted mt-3">No GIFs found.</p>'
+        );
+        return;
+      }
+
+      appendGifsToColumns(gifs);
     })
     .finally(() => {
       isLoading = false;
@@ -103,43 +147,95 @@ const loadMoreTrending = () => {
 };
 
 /**
- * Handles scrolling on the Trending page.
- * When user reaches near the bottom, loads more GIFs.
+ * Handles scrolling while the grid (Trending/Search) is active.
  *
  * @returns {void}
  */
-const onTrendingScroll = () => {
+const onGridScroll = () => {
   if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 500) {
-    loadMoreTrending();
+    loadMoreGridGifs();
   }
 };
 
 /**
- * Enters the Trending page.
- * Renders the layout, loads the first batch of GIFs, and attaches the scroll listener.
+ * Starts (or restarts) the grid mode.
+ *
+ * @param {'trending'|'search'} mode
+ * @param {string} [query]
+ * @returns {void}
+ */
+const enterGridMode = (mode, query = "") => {
+  // ensure we don't keep multiple listeners around
+  exitGridMode();
+
+  activeGridMode = mode;
+  activeSearchQuery = query;
+
+  renderGridLayout({ mode, query });
+  loadMoreGridGifs();
+
+  window.addEventListener("scroll", onGridScroll);
+};
+
+/**
+ * Stops the grid mode (Trending/Search) and removes listeners.
+ *
+ * @returns {void}
+ */
+const exitGridMode = () => {
+  isLoading = false;
+  activeGridMode = "none";
+  activeSearchQuery = "";
+  renderedCount = 0;
+
+  window.removeEventListener("scroll", onGridScroll);
+};
+
+/**
+ * Enters the Trending page (infinite scroll).
  *
  * @returns {void}
  */
 export const renderTrending = () => {
-  isTrendingActive = true;
-
-  renderTrendingLayout();
-  loadMoreTrending();
-
-  window.addEventListener("scroll", onTrendingScroll);
+  enterGridMode("trending");
 };
 
 /**
- * Exits the Trending page.
- * Marks the page as inactive, stops any loading in progress, and removes the scroll listener.
+ * Exits the Trending page (kept for compatibility with older code).
  *
  * @returns {void}
  */
 export const exitTrending = () => {
-  isTrendingActive = false;
-  isLoading = false;
+  if (activeGridMode === "trending") {
+    exitGridMode();
+  }
+};
 
-  window.removeEventListener("scroll", onTrendingScroll);
+/**
+ * Renders search results (infinite scroll) for a given query.
+ *
+ * @param {string} query
+ * @returns {void}
+ */
+export const renderSearch = (query) => {
+  const qTrim = (query || "").trim();
+  if (!qTrim) {
+    renderTrending();
+    return;
+  }
+
+  enterGridMode("search", qTrim);
+};
+
+/**
+ * Exits the Search view if active.
+ *
+ * @returns {void}
+ */
+export const exitSearch = () => {
+  if (activeGridMode === "search") {
+    exitGridMode();
+  }
 };
 
 /**
@@ -148,6 +244,7 @@ export const exitTrending = () => {
  * @returns {void}
  */
 export const renderAbout = () => {
+  exitGridMode();
   q(CONTAINER_SELECTOR).innerHTML = toAboutView();
 };
 
@@ -157,6 +254,7 @@ export const renderAbout = () => {
  * @returns {void}
  */
 export const renderUpload = () => {
+  exitGridMode();
   q(CONTAINER_SELECTOR).innerHTML = uploadView();
   attachUploadEvents();
 };
@@ -167,11 +265,13 @@ export const renderUpload = () => {
  * @returns {void}
  */
 export const renderUploaded = () => {
+  exitGridMode();
+
   const ids = getUploadedGifs();
 
   loadGifsByIds(ids).then((res) => {
     const favoriteIds = new Set(getFavoriteGifIds());
-    const gifsHtml = res.data
+    const gifsHtml = (res?.data || [])
       .map((gif) => toTrendingView(gif, favoriteIds.has(gif.id)))
       .join("");
 
@@ -183,11 +283,13 @@ export const renderUploaded = () => {
  * Fetches a GIF by its ID and renders its details inside a container.
  *
  * @param {string} gifId - The unique identifier of the GIF to fetch and display.
- * @returns {void} This function does not return anything. It updates the DOM asynchronously.
+ * @returns {void}
  */
 export const renderGifDetails = (gifId) => {
+  exitGridMode();
+
   loadGifById(gifId).then((res) => {
-    const gif = res.data;
+    const gif = res?.data;
 
     if (!gif) {
       q(CONTAINER_SELECTOR).innerHTML = "<p>GIF not found.</p>";
@@ -196,39 +298,44 @@ export const renderGifDetails = (gifId) => {
 
     q(CONTAINER_SELECTOR).innerHTML = gifDetailsView(gif);
   });
-}
+};
 
 /**
- * Handles click events on the document to provide GIF-related interactions.
+ * Handles click events on the document for:
+ * - Back button in GIF details
+ * - Opening GIF details from a GIF card
  *
- * - If the clicked element has an id of "back-btn", it renders trending GIFs.
- * - If the clicked element or its parent has a `data-action` attribute:
- *   - `"toggle-favorite"` toggles the GIF as favorite.
- *   - `"open-details"` opens the GIF details by calling `renderGifDetails`.
+ * Favorites toggling is handled in favorites-events.js.
  *
- * @param {MouseEvent} e - The click event object.
+ * @param {MouseEvent} e
+ * @returns {void}
  */
 document.addEventListener("click", (e) => {
-
   if (e.target.id === "back-btn") {
+    // Keep the UX simple: back goes to Trending.
+    const searchInput = document.querySelector("#search");
+    if (searchInput) {
+      searchInput.value = "";
+    }
     renderTrending();
     return;
   }
 
   const actionEl = e.target.closest("[data-action]");
-  if (!actionEl) return;
-
-  const gifId = actionEl.dataset.gifId;
-
-  if (actionEl.dataset.action === "toggle-favorite") {
-    e.stopPropagation();
-    toggleFavorite(gifId);
+  if (!actionEl) {
     return;
   }
 
-  if (actionEl.dataset.action === "open-details") {
-    renderGifDetails(gifId);
+  if (actionEl.dataset.action !== "open-details") {
+    return;
   }
+
+  const gifId = actionEl.dataset.gifId;
+  if (!gifId) {
+    return;
+  }
+
+  renderGifDetails(gifId);
 });
 
 /**
@@ -238,12 +345,14 @@ document.addEventListener("click", (e) => {
  * @returns {string} A GIF URL.
  */
 const getRandomGifUrl = (gif) => {
-  return gif?.images?.fixed_height?.url
-    || gif?.images?.original?.url
-    || gif?.image_url
-    || gif?.image_original_url
-    || gif?.image_fixed_height_url
-    || '';
+  return (
+    gif?.images?.fixed_height?.url ||
+    gif?.images?.original?.url ||
+    gif?.image_url ||
+    gif?.image_original_url ||
+    gif?.image_fixed_height_url ||
+    ""
+  );
 };
 
 /**
@@ -253,16 +362,18 @@ const getRandomGifUrl = (gif) => {
  * @returns {void}
  */
 export const renderFavorites = () => {
+  exitGridMode();
+
   const favoriteIdsArr = getFavoriteGifIds();
 
   q(CONTAINER_SELECTOR).innerHTML = toFavoritesView(
-    favoriteIdsArr.length ? '' : 'You have no favorites yet.'
+    favoriteIdsArr.length ? "" : "You have no favorites yet."
   );
 
   if (!favoriteIdsArr.length) {
-    // Keep the previous behavior: show a random GIF when there are no favorites yet.
+    // Show a random GIF when there are no favorites yet.
     loadRandomGif().then((res) => {
-      const randomGif = res.data;
+      const randomGif = res?.data;
 
       if (!randomGif?.id) {
         return;
@@ -270,19 +381,34 @@ export const renderFavorites = () => {
 
       // Re-render so the random GIF shows under the message.
       q(CONTAINER_SELECTOR).innerHTML = toFavoritesView(
-        'You have no favorites yet. Here is a random one:'
+        "You have no favorites yet. Here is a random one:"
       );
 
       const favoriteIds = new Set(getFavoriteGifIds());
-      const gifHtml = toTrendingView(randomGif, favoriteIds.has(randomGif.id));
 
-      const columns = [[], [], [], []];
-      columns[0].push(gifHtml);
+      // Normalize random gif data for the card (ensure fixed_height.url exists)
+      const url = getRandomGifUrl(randomGif);
+      const normalized = {
+        ...randomGif,
+        images: {
+          ...(randomGif.images || {}),
+          fixed_height: {
+            ...(randomGif.images?.fixed_height || {}),
+            url,
+          },
+        },
+        title: randomGif?.title || "Random GIF",
+      };
 
-      columns.forEach((colGifs, index) => {
-        const col = q(`#favorites-col-${index + 1}`);
-        col.insertAdjacentHTML("beforeend", colGifs.join(""));
-      });
+      const gifHtml = toTrendingView(
+        normalized,
+        favoriteIds.has(normalized.id)
+      );
+
+      const firstCol = q("#favorites-col-1");
+      if (firstCol) {
+        firstCol.insertAdjacentHTML("beforeend", gifHtml);
+      }
     });
 
     return;
@@ -290,7 +416,7 @@ export const renderFavorites = () => {
 
   loadGifsByIds(favoriteIdsArr).then((res) => {
     const favoriteIds = new Set(getFavoriteGifIds());
-    const gifs = res.data;
+    const gifs = res?.data || [];
 
     const columns = [[], [], [], []];
 
@@ -301,6 +427,9 @@ export const renderFavorites = () => {
 
     columns.forEach((colGifs, index) => {
       const col = q(`#favorites-col-${index + 1}`);
+      if (!col) {
+        return;
+      }
       col.insertAdjacentHTML("beforeend", colGifs.join(""));
     });
   });

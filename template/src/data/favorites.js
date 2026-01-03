@@ -1,4 +1,4 @@
-const FAVORITES_KEY = 'favoriteGifIds';
+const FAVORITES_KEY = "favoriteGifIds";
 
 /**
  * Gets all stored favorite GIF ids from localStorage.

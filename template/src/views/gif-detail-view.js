@@ -16,8 +16,6 @@
  * @returns {string} HTML string representing the GIF details view.
  */
 export const gifDetailsView = (gif) => {
-
-
   return `
     <div class="container-md text-center mt-4">
       <button class="btn btn-secondary mb-3" id="back-btn">

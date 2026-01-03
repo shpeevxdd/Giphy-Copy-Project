@@ -1,4 +1,4 @@
-let uploadedGifs = JSON.parse(localStorage.getItem('uploadedGifs')) || [];
+let uploadedGifs = JSON.parse(localStorage.getItem("uploadedGifs")) || [];
 
 /**
  * Stores an uploaded GIF ID in localStorage.
@@ -12,7 +12,7 @@ export const addUploadedGif = (gifId) => {
   }
 
   uploadedGifs.push(gifId);
-  localStorage.setItem('uploadedGifs', JSON.stringify(uploadedGifs));
+  localStorage.setItem("uploadedGifs", JSON.stringify(uploadedGifs));
 };
 
 /**
@@ -23,7 +23,7 @@ export const addUploadedGif = (gifId) => {
  */
 export const removeUploadedGif = (gifId) => {
   uploadedGifs = uploadedGifs.filter((id) => id !== gifId);
-  localStorage.setItem('uploadedGifs', JSON.stringify(uploadedGifs));
+  localStorage.setItem("uploadedGifs", JSON.stringify(uploadedGifs));
 };
 
 /**

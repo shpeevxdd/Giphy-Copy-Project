@@ -1,4 +1,4 @@
-import { EMPTY_HEART, FULL_HEART } from '../common/constants.js';
+import { EMPTY_HEART, FULL_HEART } from "../common/constants.js";
 
 /**
  * Generates the HTML markup for a single trending GIF card.
@@ -18,7 +18,7 @@ export const toTrendingView = (gif, isFavorite = false) => `
       class="btn btn-sm btn-outline-warning mt-1 toggle-favorite-btn position"
       data-gif-id="${gif.id}"
       data-action="toggle-favorite"
-      aria-label="${isFavorite ? 'Remove from favorites' : 'Add to favorites'}"
+      aria-label="${isFavorite ? "Remove from favorites" : "Add to favorites"}"
     >
       ${isFavorite ? FULL_HEART : EMPTY_HEART}
     </button>

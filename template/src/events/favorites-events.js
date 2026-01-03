@@ -1,8 +1,12 @@
-import { EMPTY_HEART, FULL_HEART, CONTAINER_SELECTOR } from '../common/constants.js';
-import { toggleFavoriteGifId, getFavoriteGifIds } from '../data/favorites.js';
-import { loadRandomGif } from '../requests/request-service.js';
-import { toFavoritesView } from '../views/favorites-view.js';
-import { toTrendingView } from '../views/trending-view.js';
+import {
+  EMPTY_HEART,
+  FULL_HEART,
+  CONTAINER_SELECTOR,
+} from "../common/constants.js";
+import { toggleFavoriteGifId } from "../data/favorites.js";
+import { loadRandomGif } from "../requests/request-service.js";
+import { toFavoritesView } from "../views/favorites-view.js";
+import { toTrendingView } from "../views/trending-view.js";
 
 /**
  * Attaches click handling for adding/removing favorite GIFs.
@@ -10,7 +14,7 @@ import { toTrendingView } from '../views/trending-view.js';
  * @returns {void}
  */
 export const attachFavoritesEvents = () => {
-  document.addEventListener('click', onToggleFavoriteClick);
+  document.addEventListener("click", onToggleFavoriteClick);
 };
 
 /**
@@ -26,7 +30,7 @@ const normalizeRandomGifForCard = (gif) => {
     gif?.image_fixed_height_url ||
     gif?.image_original_url ||
     gif?.image_url ||
-    '';
+    "";
 
   return {
     ...gif,
@@ -37,7 +41,7 @@ const normalizeRandomGifForCard = (gif) => {
         url,
       },
     },
-    title: gif?.title || 'Random GIF',
+    title: gif?.title || "Random GIF",
   };
 };
 
@@ -48,21 +52,25 @@ const normalizeRandomGifForCard = (gif) => {
  */
 const showEmptyFavoritesStateWithRandomGif = () => {
   const container = document.querySelector(CONTAINER_SELECTOR);
-  if (!container) return;
+  if (!container) {
+    return;
+  }
 
   container.innerHTML = toFavoritesView(
-    'You have no favorites yet. Here is a random one:'
+    "You have no favorites yet. Here is a random one:"
   );
 
   loadRandomGif().then((res) => {
-    if (!res?.data) return;
+    if (!res?.data) {
+      return;
+    }
 
     const randomGif = normalizeRandomGifForCard(res.data);
     const gifHtml = toTrendingView(randomGif, false);
 
-    const firstCol = document.querySelector('#favorites-col-1');
+    const firstCol = document.querySelector("#favorites-col-1");
     if (firstCol) {
-      firstCol.insertAdjacentHTML('beforeend', gifHtml);
+      firstCol.insertAdjacentHTML("beforeend", gifHtml);
     }
   });
 };
@@ -74,22 +82,26 @@ const showEmptyFavoritesStateWithRandomGif = () => {
  * @returns {void}
  */
 const onToggleFavoriteClick = (e) => {
-  const btn = e.target.closest('.toggle-favorite-btn');
-  if (!btn) return;
+  const btn = e.target.closest(".toggle-favorite-btn");
+  if (!btn) {
+    return;
+  }
 
-  const gifId = btn.getAttribute('data-gif-id');
+  const gifId = btn.getAttribute("data-gif-id");
   const isNowFavorite = toggleFavoriteGifId(gifId);
 
   btn.textContent = isNowFavorite ? FULL_HEART : EMPTY_HEART;
   btn.setAttribute(
-    'aria-label',
-    isNowFavorite ? 'Remove from favorites' : 'Add to favorites'
+    "aria-label",
+    isNowFavorite ? "Remove from favorites" : "Add to favorites"
   );
 
-  const favoritesContainer = document.querySelector('#favorites');
-  if (!favoritesContainer) return;
+  const favoritesContainer = document.querySelector("#favorites");
+  if (!favoritesContainer) {
+    return;
+  }
 
-  const card = btn.closest('.gif-card');
+  const card = btn.closest(".gif-card");
 
   /**
    * REMOVING A FAVORITE
@@ -97,7 +109,7 @@ const onToggleFavoriteClick = (e) => {
   if (!isNowFavorite && card) {
     card.remove();
 
-    const remainingCards = favoritesContainer.querySelectorAll('.gif-card');
+    const remainingCards = favoritesContainer.querySelectorAll(".gif-card");
     if (remainingCards.length === 0) {
       showEmptyFavoritesStateWithRandomGif();
     }
@@ -110,7 +122,7 @@ const onToggleFavoriteClick = (e) => {
    * → remove the "no favorites" message
    */
   if (isNowFavorite) {
-    const message = document.querySelector('.favorites p');
+    const message = document.querySelector(".favorites p");
     if (message) {
       message.remove();
     }

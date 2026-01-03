@@ -1,4 +1,4 @@
-import { removeUploadedGif } from '../data/uploaded-gifs.js';
+import { removeUploadedGif } from "../data/uploaded-gifs.js";
 
 /**
  * Ensures each uploaded GIF card has a Delete button.
@@ -6,27 +6,34 @@ import { removeUploadedGif } from '../data/uploaded-gifs.js';
  * @returns {void}
  */
 const ensureDeleteButtons = () => {
-  const uploadedSection = document.querySelector('.uploaded');
-  if (!uploadedSection) return;
+  const uploadedSection = document.querySelector(".uploaded");
+  if (!uploadedSection) {
+    return;
+  }
 
-  const cards = uploadedSection.querySelectorAll('.gif-card');
+  const cards = uploadedSection.querySelectorAll(".gif-card");
 
   cards.forEach((card) => {
-    const gifId = card.getAttribute('data-gif-id');
-    if (!gifId) return;
+    const gifId = card.getAttribute("data-gif-id");
+    if (!gifId) {
+      return;
+    }
 
     // Prevent duplicates
-    if (card.querySelector('.delete-upload-btn')) return;
+    if (card.querySelector(".delete-upload-btn")) {
+      return;
+    }
 
-    const deleteBtn = document.createElement('button');
-    deleteBtn.className = 'btn btn-sm btn-outline-danger mt-1 delete-upload-btn';
-    deleteBtn.setAttribute('data-gif-id', gifId);
-    deleteBtn.textContent = 'Delete';
+    const deleteBtn = document.createElement("button");
+    deleteBtn.className =
+      "btn btn-sm btn-outline-danger mt-1 delete-upload-btn";
+    deleteBtn.setAttribute("data-gif-id", gifId);
+    deleteBtn.textContent = "Delete";
 
     // Place next to existing action button if present, otherwise append at end
-    const existingActionBtn = card.querySelector('button');
+    const existingActionBtn = card.querySelector("button");
     if (existingActionBtn && existingActionBtn.parentElement === card) {
-      existingActionBtn.insertAdjacentElement('afterend', deleteBtn);
+      existingActionBtn.insertAdjacentElement("afterend", deleteBtn);
     } else {
       card.appendChild(deleteBtn);
     }
@@ -40,28 +47,34 @@ const ensureDeleteButtons = () => {
  * @returns {void}
  */
 const onDeleteUploadClick = (e) => {
-  const btn = e.target.closest('.delete-upload-btn');
-  if (!btn) return;
+  const btn = e.target.closest(".delete-upload-btn");
+  if (!btn) {
+    return;
+  }
 
-  const gifId = btn.getAttribute('data-gif-id');
-  if (!gifId) return;
+  const gifId = btn.getAttribute("data-gif-id");
+  if (!gifId) {
+    return;
+  }
 
   removeUploadedGif(gifId);
 
-  const card = btn.closest('.gif-card');
+  const card = btn.closest(".gif-card");
   if (card) {
     card.remove();
   }
 
   // If no cards left, show empty message
-  const uploadedSection = document.querySelector('.uploaded');
-  if (!uploadedSection) return;
+  const uploadedSection = document.querySelector(".uploaded");
+  if (!uploadedSection) {
+    return;
+  }
 
-  const remaining = uploadedSection.querySelectorAll('.gif-card');
+  const remaining = uploadedSection.querySelectorAll(".gif-card");
   if (remaining.length === 0) {
-    const container = uploadedSection.querySelector('.gifs-container');
+    const container = uploadedSection.querySelector(".gifs-container");
     if (container) {
-      container.innerHTML = '<p>No uploaded GIFs yet.</p>';
+      container.innerHTML = "<p>No uploaded GIFs yet.</p>";
     }
   }
 };
@@ -75,13 +88,13 @@ const onDeleteUploadClick = (e) => {
  * @returns {void}
  */
 export const attachUploadedEvents = () => {
-  document.addEventListener('click', onDeleteUploadClick);
+  document.addEventListener("click", onDeleteUploadClick);
 
   // Add buttons immediately if uploads page is already in DOM
   ensureDeleteButtons();
 
   // Watch for when the app renders the uploads page (async)
-  const root = document.querySelector('#container') || document.body;
+  const root = document.querySelector("#container") || document.body;
 
   const observer = new MutationObserver(() => {
     ensureDeleteButtons();
