@@ -1,3 +1,4 @@
+import { favoriteButtonView } from "./heart-view.js";
 /**
  * Generates an HTML string displaying the details of a GIF.
  *
@@ -24,11 +25,14 @@ export const gifDetailsView = (gif, isFavorite = false) => {
 
       <h3 class="mb-3">${gif.title || "Untitled GIF"}</h3>
 
-      <img
-        src="${gif.images.fixed_height.url}"
-        alt="${gif.title}"
-        class="img-fluid mb-3"
-      />
+      <div class="gif-card mx-auto">
+        <img
+          src="${gif.images.fixed_height.url}"
+          alt="${gif.title}"
+          class="img-fluid mb-3"
+        />
+        ${favoriteButtonView(gif.id, isFavorite)}
+      </div>
 
       <p><strong>Author:</strong> ${gif.username || "Anonymous"}</p>
       <p><strong>Rating:</strong> ${gif.rating || "N/A"}</p>
