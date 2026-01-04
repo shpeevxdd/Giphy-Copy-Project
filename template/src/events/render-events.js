@@ -13,7 +13,7 @@ import { q } from "./helpers.js";
 import { CONTAINER_SELECTOR } from "../common/constants.js";
 import { getUploadedGifs } from "../data/uploaded-gifs.js";
 import { toUploadedView } from "../views/uploaded-view.js";
-import { getFavoriteGifIds } from "../data/favorites.js";
+import { getFavoriteGifIds, isFavoriteGifId } from "../data/favorites.js";
 import { toFavoritesView } from "../views/favorites-view.js";
 import { gifDetailsView } from "../views/gif-detail-view.js";
 
@@ -296,7 +296,9 @@ export const renderGifDetails = (gifId) => {
       return;
     }
 
-    q(CONTAINER_SELECTOR).innerHTML = gifDetailsView(gif);
+    const isFav = isFavoriteGifId(gifId);
+
+    q(CONTAINER_SELECTOR).innerHTML = gifDetailsView(gif, isFav);
   });
 };
 
@@ -312,7 +314,6 @@ export const renderGifDetails = (gifId) => {
  */
 document.addEventListener("click", (e) => {
   if (e.target.id === "back-btn") {
-    // Keep the UX simple: back goes to Trending.
     const searchInput = document.querySelector("#search");
     if (searchInput) {
       searchInput.value = "";
@@ -371,7 +372,6 @@ export const renderFavorites = () => {
   );
 
   if (!favoriteIdsArr.length) {
-    // Show a random GIF when there are no favorites yet.
     loadRandomGif().then((res) => {
       const randomGif = res?.data;
 
@@ -379,14 +379,12 @@ export const renderFavorites = () => {
         return;
       }
 
-      // Re-render so the random GIF shows under the message.
       q(CONTAINER_SELECTOR).innerHTML = toFavoritesView(
         "You have no favorites yet. Here is a random one:"
       );
 
       const favoriteIds = new Set(getFavoriteGifIds());
 
-      // Normalize random gif data for the card (ensure fixed_height.url exists)
       const url = getRandomGifUrl(randomGif);
       const normalized = {
         ...randomGif,

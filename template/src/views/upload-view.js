@@ -5,7 +5,7 @@
  */
 export const uploadView = () => `
   <section class="upload">
-    <div class="container-md">
+    <div class="container-md text-center">
       <h2>Upload GIF</h2>
 
       <input type="file" id="gif-upload-input" accept="image/gif" />

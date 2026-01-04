@@ -24,7 +24,6 @@ import { setActiveNav } from "./helpers.js";
  * @returns {void|null} Renders the corresponding page or returns null if page is invalid.
  */
 export const loadPage = (page) => {
-  // Stop any grid infinite-scroll modes before switching pages.
   exitTrending();
   exitSearch();
 

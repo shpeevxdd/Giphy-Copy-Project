@@ -6,7 +6,7 @@
  */
 export const toUploadedView = (gifsHtml) => `
   <section class="uploaded">
-    <div class="container-md">
+    <div class="container-md text-center">
       <h2>My Uploaded GIFs</h2>
       <div class="gifs-container">
         ${gifsHtml || "<p>No uploaded GIFs yet.</p>"}

@@ -1,11 +1,12 @@
 /* Template styling */
 
-html, body {
+html,
+body {
   margin: 0;
 }
 
 body {
-  font-family: 'Roboto', sans-serif !important; 
+  font-family: "Roboto", sans-serif !important;
   background-color: rgb(18, 18, 18) !important;
 }
 
@@ -19,27 +20,37 @@ nav {
   display: flex;
 }
 
-nav a {
-  color: rgb(95, 191, 255);
-  text-decoration: none;
-  margin: 0 10px;
-}
-
-nav a:hover {
-  color: rgb(198, 115, 247);
+nav a.nav-link.btn.btn-outline-light:hover,
+nav a.nav-link.btn.btn-outline-light:focus,
+nav a.nav-link.btn.btn-outline-light:active,
+nav a.nav-link.btn.btn-outline-light.active {
+  color: #ffffff !important;
+  background-color: #494949;
+  border-color: #adb5bd !important;
+  text-decoration: none !important;
 }
 
 #container {
   grid-area: container;
-  padding: 20px;
   color: white;
 }
 
 footer {
   grid-area: footer;
-  padding: 10px;
+  padding: 20px;
   text-align: center;
   color: #ccc;
+}
+
+#app {
+  display: grid;
+  grid-template-areas:
+    "header"
+    "menu"
+    "container"
+    "footer";
+  grid-template-rows: auto 0 1fr auto;
+  min-height: 100vh; /* ADDED */
 }
 
 .hidden {
@@ -72,18 +83,14 @@ span.favorite.active {
 }
 
 span.favorite:hover {
-  color:rgb(187, 135, 255)
+  color: rgb(187, 135, 255);
 }
 
 /* End template styling */
 
-
-
 /* Add your styles below */
 
-
 /* Homepage styles */
-
 
 #home {
   padding: 50px;
@@ -100,7 +107,6 @@ span.favorite:hover {
 }
 
 /* End homepage styles */
-
 
 /* Movies styles */
 
@@ -197,13 +203,11 @@ div.movie-detailed div.movie-info {
 
 /* End movies styles */
 
-
 /* About styles */
 
 #about {
   padding: 50px;
 }
-
 
 #about h1 {
   color: rgb(187, 135, 255);
@@ -215,7 +219,6 @@ div.movie-detailed div.movie-info {
 }
 
 /* End about styles */
-
 
 .gif-card {
   width: 251px;

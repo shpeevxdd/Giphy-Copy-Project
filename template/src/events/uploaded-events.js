@@ -19,7 +19,6 @@ const ensureDeleteButtons = () => {
       return;
     }
 
-    // Prevent duplicates
     if (card.querySelector(".delete-upload-btn")) {
       return;
     }
@@ -30,7 +29,6 @@ const ensureDeleteButtons = () => {
     deleteBtn.setAttribute("data-gif-id", gifId);
     deleteBtn.textContent = "Delete";
 
-    // Place next to existing action button if present, otherwise append at end
     const existingActionBtn = card.querySelector("button");
     if (existingActionBtn && existingActionBtn.parentElement === card) {
       existingActionBtn.insertAdjacentElement("afterend", deleteBtn);
@@ -64,7 +62,6 @@ const onDeleteUploadClick = (e) => {
     card.remove();
   }
 
-  // If no cards left, show empty message
   const uploadedSection = document.querySelector(".uploaded");
   if (!uploadedSection) {
     return;
@@ -90,10 +87,8 @@ const onDeleteUploadClick = (e) => {
 export const attachUploadedEvents = () => {
   document.addEventListener("click", onDeleteUploadClick);
 
-  // Add buttons immediately if uploads page is already in DOM
   ensureDeleteButtons();
 
-  // Watch for when the app renders the uploads page (async)
   const root = document.querySelector("#container") || document.body;
 
   const observer = new MutationObserver(() => {
