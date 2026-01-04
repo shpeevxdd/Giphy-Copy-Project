@@ -86,139 +86,8 @@ span.favorite:hover {
   color: rgb(187, 135, 255);
 }
 
-/* End template styling */
-
-/* Add your styles below */
-
-/* Homepage styles */
-
-#home {
-  padding: 50px;
-}
-
-#home h1 {
-  text-align: center;
-}
-
-#home div.content {
-  max-width: 500px;
-  margin: 50px auto;
-  font-size: 1.5em;
-}
 
 /* End homepage styles */
-
-/* Movies styles */
-
-#movies {
-  padding: 50px;
-}
-
-#movies h1 {
-  color: rgb(187, 135, 255);
-}
-
-#movies div.content {
-  font-size: 1.25em;
-  text-align: center;
-}
-
-div.movie {
-  display: inline-block;
-  width: 20%;
-  margin: 1%;
-  padding: 1%;
-  border: 1px solid rgb(97, 71, 97);
-  border-radius: 4px;
-  background-color: rgba(0, 0, 0, 0.5);
-  backdrop-filter: blur(2px);
-  text-align: center;
-}
-
-div.movie h1 {
-  font-size: 1.5em;
-  margin: 5px;
-}
-
-div.movie h2 {
-  font-size: 1.25em;
-  margin: 5px;
-}
-
-div.movie img {
-  width: 100%;
-  margin-bottom: 20px;
-}
-
-#movies button {
-  font-size: 20px;
-  padding: 5px;
-  color: rgb(222, 113, 255);
-  background-color: rgba(0, 0, 0, 0.5);
-  border: 1px solid black;
-  cursor: pointer;
-}
-
-#movies button:hover {
-  color: white;
-}
-
-/* Single movie styles */
-
-div.movie-detailed {
-  padding: 20px;
-  border: 1px solid rgb(97, 71, 97);
-  background-color: rgba(0, 0, 0, 0.5);
-  backdrop-filter: blur(2px);
-  display: table;
-  width: 100%;
-}
-
-div.movie-detailed p {
-  font-size: 1.25em;
-  color: #eee;
-}
-
-div.movie-detailed div.poster {
-  width: 30%;
-  display: table-cell;
-  padding: 20px;
-  margin: 10px;
-  border-right: 1px solid rgb(112, 112, 112);
-}
-
-div.movie-detailed div.poster img {
-  width: 100%;
-}
-
-div.movie-detailed div.movie-info {
-  padding: 20px;
-  margin: 10px;
-  vertical-align: top;
-  display: table-cell;
-  text-align: left;
-  width: 70%;
-  /* height: 100%; */
-}
-
-/* End movies styles */
-
-/* About styles */
-
-#about {
-  padding: 50px;
-}
-
-#about h1 {
-  color: rgb(187, 135, 255);
-  margin-bottom: 50px;
-}
-
-#about h2 {
-  color: rgb(229, 210, 255);
-}
-
-/* End about styles */
 
 .gif-card {
   width: 251px;
@@ -268,4 +137,11 @@ div.movie-detailed div.movie-info {
 
 #search-btn:hover {
   opacity: 1;
+}
+
+
+@media screen and (max-width: 580px) {
+  nav.button-query {
+    height: 120px;
+  }
 }
