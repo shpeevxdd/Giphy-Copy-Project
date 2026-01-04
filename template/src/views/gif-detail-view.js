@@ -15,7 +15,7 @@
  * @param {string} [gif.rating] - The rating of the GIF (e.g., "g", "pg").
  * @returns {string} HTML string representing the GIF details view.
  */
-export const gifDetailsView = (gif) => {
+export const gifDetailsView = (gif, isFavorite = false) => {
   return `
     <div class="container-md text-center mt-4">
       <button class="btn btn-secondary mb-3" id="back-btn">

@@ -5,13 +5,15 @@
  */
 export const uploadView = () => `
   <section class="upload">
-    <h2>Upload GIF</h2>
+    <div class="container-md">
+      <h2>Upload GIF</h2>
 
-    <input type="file" id="gif-upload-input" accept="image/gif" />
-    <button id="upload-gif-btn">Upload</button>
+      <input type="file" id="gif-upload-input" accept="image/gif" />
+      <button id="upload-gif-btn">Upload</button>
 
-    <p id="upload-status"></p>
+      <p id="upload-status"></p>
 
-    <div id="uploaded-gif"></div>
+      <div id="uploaded-gif"></div>
+    </div>
   </section>
 `;

@@ -15,7 +15,7 @@ export const toTrendingView = (gif, isFavorite = false) => `
       class="img-fluid"
     />
     <button
-      class="btn btn-sm btn-outline-warning mt-1 toggle-favorite-btn position"
+      class="btn btn-sm btn-dark mt-1 toggle-favorite-btn position"
       data-gif-id="${gif.id}"
       data-action="toggle-favorite"
       aria-label="${isFavorite ? "Remove from favorites" : "Add to favorites"}"
