@@ -41,35 +41,6 @@ export const isFavoriteGifId = (gifId) => {
 };
 
 /**
- * Adds a GIF id to favorites (no duplicates).
- *
- * @param {string} gifId - The GIF id.
- * @returns {string[]} Updated favorites array.
- */
-export const addFavoriteGifId = (gifId) => {
-  const ids = getFavoriteGifIds();
-
-  if (!ids.includes(gifId)) {
-    ids.push(gifId);
-    setFavoriteGifIds(ids);
-  }
-
-  return ids;
-};
-
-/**
- * Removes a GIF id from favorites.
- *
- * @param {string} gifId - The GIF id.
- * @returns {string[]} Updated favorites array.
- */
-export const removeFavoriteGifId = (gifId) => {
-  const ids = getFavoriteGifIds().filter((id) => id !== gifId);
-  setFavoriteGifIds(ids);
-  return ids;
-};
-
-/**
  * Toggles a GIF id in favorites.
  *
  * @param {string} gifId - The GIF id.
