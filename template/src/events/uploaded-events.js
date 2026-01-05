@@ -24,6 +24,7 @@ const ensureDeleteButtons = () => {
     }
 
     const deleteBtn = document.createElement("button");
+    deleteBtn.type = "button";
     deleteBtn.className =
       "btn btn-sm btn-outline-danger mt-1 delete-upload-btn";
     deleteBtn.setAttribute("data-gif-id", gifId);
@@ -40,6 +41,8 @@ const ensureDeleteButtons = () => {
 
 /**
  * Handles deleting an uploaded GIF from storage and the UI.
+ * IMPORTANT: Runs in the capture phase (see attachUploadedEvents) to prevent
+ * the global "open-details" click handler from firing.
  *
  * @param {MouseEvent} e
  * @returns {void}
@@ -49,6 +52,10 @@ const onDeleteUploadClick = (e) => {
   if (!btn) {
     return;
   }
+
+  e.preventDefault();
+  e.stopPropagation();
+  e.stopImmediatePropagation();
 
   const gifId = btn.getAttribute("data-gif-id");
   if (!gifId) {
@@ -79,13 +86,13 @@ const onDeleteUploadClick = (e) => {
 /**
  * Attaches events to support deleting uploaded GIFs on the "My Uploads" page.
  * Uses:
- * - event delegation for delete clicks
+ * - event delegation for delete clicks (CAPTURE PHASE to beat open-details handler)
  * - a MutationObserver to add delete buttons whenever the uploads page is rendered
  *
  * @returns {void}
  */
 export const attachUploadedEvents = () => {
-  document.addEventListener("click", onDeleteUploadClick);
+  document.addEventListener("click", onDeleteUploadClick, true);
 
   ensureDeleteButtons();
 
