@@ -12,21 +12,18 @@ import {
   renderUpload,
   renderUploaded,
   renderFavorites,
-  exitTrending,
-  exitSearch,
 } from "./render-events.js";
 import { setActiveNav } from "./helpers.js";
 
 /**
  * Loads and renders a page based on the given page identifier.
+ * Each render function handles its own cleanup (exitGridMode),
+ * so no manual exit calls are needed here.
  *
  * @param {string} page - The page constant that determines which view to render.
  * @returns {void|null} Renders the corresponding page or returns null if page is invalid.
  */
 export const loadPage = (page) => {
-  exitTrending();
-  exitSearch();
-
   switch (page) {
     case HOME:
     case TRENDING:

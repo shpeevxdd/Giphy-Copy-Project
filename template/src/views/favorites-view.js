@@ -6,13 +6,13 @@
  */
 export const toFavoritesView = (message = "") => `
   <section class="favorites">
-    <div class="text-center"><h2>Favorites</h2></div>
-    ${message ? `<p class="text-warning text-center">${message}</p>` : ""}
-    <div class="container-md d-flex justify-content-center flex-wrap gap-2" id="favorites">
-      <div class="column" style="flex: 0 0 200px;" id="favorites-col-1"></div>
-      <div class="column" style="flex: 0 0 200px;" id="favorites-col-2"></div>
-      <div class="column" style="flex: 0 0 200px;" id="favorites-col-3"></div>
-      <div class="column" style="flex: 0 0 200px;" id="favorites-col-4"></div>
+    <h2 class="section-title">Favorites</h2>
+    ${message ? `<p class="section-subtitle">${message}</p>` : ""}
+    <div id="favorites">
+      <div class="column" id="favorites-col-1"></div>
+      <div class="column" id="favorites-col-2"></div>
+      <div class="column" id="favorites-col-3"></div>
+      <div class="column" id="favorites-col-4"></div>
     </div>
   </section>
 `;

@@ -25,8 +25,7 @@ const ensureDeleteButtons = () => {
 
     const deleteBtn = document.createElement("button");
     deleteBtn.type = "button";
-    deleteBtn.className =
-      "btn btn-sm btn-outline-danger mt-1 delete-upload-btn";
+    deleteBtn.className = "delete-upload-btn";
     deleteBtn.setAttribute("data-gif-id", gifId);
     deleteBtn.textContent = "Delete";
 
@@ -78,7 +77,7 @@ const onDeleteUploadClick = (e) => {
   if (remaining.length === 0) {
     const container = uploadedSection.querySelector(".gifs-container");
     if (container) {
-      container.innerHTML = "<p>No uploaded GIFs yet.</p>";
+      container.innerHTML = '<p class="empty-state">No uploaded GIFs yet.</p>';
     }
   }
 };

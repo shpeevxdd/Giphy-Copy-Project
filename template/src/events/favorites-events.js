@@ -2,6 +2,7 @@ import {
   EMPTY_HEART,
   FULL_HEART,
   CONTAINER_SELECTOR,
+  normalizeGif,
 } from "../common/constants.js";
 import { toggleFavoriteGifId } from "../data/favorites.js";
 import { loadRandomGif } from "../requests/request-service.js";
@@ -15,34 +16,6 @@ import { toTrendingView } from "../views/trending-view.js";
  */
 export const attachFavoritesEvents = () => {
   document.addEventListener("click", onToggleFavoriteClick);
-};
-
-/**
- * Normalizes Random GIF API response so it works with the standard GIF card.
- *
- * @param {Object} gif
- * @returns {Object}
- */
-const normalizeRandomGifForCard = (gif) => {
-  const url =
-    gif?.images?.fixed_height?.url ||
-    gif?.images?.original?.url ||
-    gif?.image_fixed_height_url ||
-    gif?.image_original_url ||
-    gif?.image_url ||
-    "";
-
-  return {
-    ...gif,
-    images: {
-      ...gif.images,
-      fixed_height: {
-        ...(gif.images?.fixed_height || {}),
-        url,
-      },
-    },
-    title: gif?.title || "Random GIF",
-  };
 };
 
 /**
@@ -60,19 +33,23 @@ const showEmptyFavoritesStateWithRandomGif = () => {
     "You have no favorites yet. Here is a random one:"
   );
 
-  loadRandomGif().then((res) => {
-    if (!res?.data) {
-      return;
-    }
+  loadRandomGif()
+    .then((res) => {
+      if (!res?.data) {
+        return;
+      }
 
-    const randomGif = normalizeRandomGifForCard(res.data);
-    const gifHtml = toTrendingView(randomGif, false);
+      const randomGif = normalizeGif(res.data);
+      const gifHtml = toTrendingView(randomGif, false);
 
-    const firstCol = document.querySelector("#favorites-col-1");
-    if (firstCol) {
-      firstCol.insertAdjacentHTML("beforeend", gifHtml);
-    }
-  });
+      const firstCol = document.querySelector("#favorites-col-1");
+      if (firstCol) {
+        firstCol.insertAdjacentHTML("beforeend", gifHtml);
+      }
+    })
+    .catch(() => {
+      /* silently degrade */
+    });
 };
 
 /**

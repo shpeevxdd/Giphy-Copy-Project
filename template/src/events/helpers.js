@@ -21,7 +21,7 @@ export const qs = (selector) => document.querySelectorAll(selector);
  * @returns {void}
  */
 export const setActiveNav = (page) => {
-  const navs = qs("a.nav-link");
+  const navs = qs("nav a.nav-link[data-page]");
 
   Array.from(navs).forEach((element) =>
     element.getAttribute("data-page") === page

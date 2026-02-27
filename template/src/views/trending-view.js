@@ -11,8 +11,9 @@ export const toTrendingView = (gif, isFavorite = false) => `
   <div class="gif-card" data-gif-id="${gif.id}" data-action="open-details">
     <img
       src="${gif.images.fixed_height.url}"
-      alt="${gif.title}"
+      alt="${gif.title || "GIF"}"
       class="img-fluid"
+      loading="lazy"
     />
     ${favoriteButtonView(gif.id, isFavorite)}
   </div>

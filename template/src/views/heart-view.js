@@ -9,7 +9,7 @@ import { EMPTY_HEART, FULL_HEART } from "../common/constants.js";
  */
 export const favoriteButtonView = (gifId, isFavorite = false) => `
   <button
-    class="btn btn-sm btn-dark mt-1 toggle-favorite-btn position"
+    class="toggle-favorite-btn${isFavorite ? " is-favorite" : ""}"
     data-gif-id="${gifId}"
     data-action="toggle-favorite"
     aria-label="${isFavorite ? "Remove from favorites" : "Add to favorites"}"

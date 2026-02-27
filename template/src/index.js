@@ -12,8 +12,10 @@ import { attachSearchEvents } from "./events/search-events.js";
  */
 document.addEventListener("DOMContentLoaded", () => {
   document.addEventListener("click", (e) => {
-    if (e.target.classList.contains("nav-link")) {
-      loadPage(e.target.getAttribute("data-page"));
+    const navLink = e.target.closest("[data-page]");
+    if (navLink) {
+      e.preventDefault();
+      loadPage(navLink.getAttribute("data-page"));
     }
   });
 
